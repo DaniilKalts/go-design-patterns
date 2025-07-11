@@ -1,0 +1,5 @@
+# Hide IDE specific configuration
+.idea/
+
+# Hide environment variables
+.env

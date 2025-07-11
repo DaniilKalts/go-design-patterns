@@ -1,0 +1,28 @@
+services:
+  postgres:
+    container_name: design-pattern-adapter-postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: gopher
+      POSTGRES_PASSWORD: gopher
+      POSTGRES_DB: adapter
+    ports:
+      - "5432:5432"
+    volumes:
+      - adapter_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "gopher", "-d", "adapter"]
+      interval: 3s
+      timeout: 2s
+      retries: 3
+
+  go:
+    container_name: design-pattern-adapter-go
+    build:
+      context: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  adapter_volume:
