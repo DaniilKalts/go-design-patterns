@@ -1,0 +1,49 @@
+services:
+  postgres:
+    container_name: design-pattern-simple-factory-postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: gopher
+      POSTGRES_PASSWORD: gopher
+      POSTGRES_DB: simple_factory
+    ports:
+      - "5432:5432"
+    volumes:
+      - simple-factory-postgresql-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "gopher", "-d", "simple_factory"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+
+  mysql:
+    container_name: design-pattern-simple-factory-mysql
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: gopher
+      MYSQL_USER: gopher
+      MYSQL_PASSWORD: gopher
+      MYSQL_DATABASE: simple_factory
+    ports:
+      - "3306:3306"
+    volumes:
+      - simple-factory-mysql-volume:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+
+  go:
+    container_name: design-pattern-simple-factory-go
+    build:
+      context: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+
+volumes:
+  simple-factory-postgresql-volume:
+  simple-factory-mysql-volume:
